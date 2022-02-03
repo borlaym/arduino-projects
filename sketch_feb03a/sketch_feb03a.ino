@@ -19,7 +19,8 @@ unsigned long echoStart = 0;
 boolean isEchoOver = false;
 unsigned long lastMeasuredDistance = 0;
 
-int NOTES[] = { 261, 277, 294, 311, 330, 349, 370, 392, 415, 440 };
+//int NOTES[] = { 261, 277, 294, 311, 330, 349, 370, 392, 415, 440 }; // chromatic
+int NOTES[] = { 261, 294, 349, 392, 440, 523 }; // pentatonic
 
 void loop() {
   unsigned long time = micros();
@@ -62,12 +63,12 @@ void loop() {
 
   // Only change sounds on a valid range from the detector
   int validRangeStart = 200;
-  int validRangeEnd = 1000;
+  int validRangeEnd = 1500;
   int range = validRangeEnd - validRangeStart;
   if (lastMeasuredDistance  > validRangeStart && lastMeasuredDistance < validRangeEnd) {
-
-    int sound = ((lastMeasuredDistance - validRangeStart) * 10) / range;
-    if (sound < 10) {
+    int notes_length = sizeof(NOTES)/sizeof(int);
+    int sound = ((lastMeasuredDistance - validRangeStart) * notes_length) / range;
+    if (sound < notes_length) {
       Serial.println(sound);
       tone(SOUND, NOTES[sound]);  
     }
