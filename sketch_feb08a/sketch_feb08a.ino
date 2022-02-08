@@ -4,7 +4,6 @@
 
 int data_pins[] = {5, 6, 7, 8, 9, 10, 11, 12};
 
-
 void setup() {
   // put your setup code here, to run once:
   pinMode(REGISTER_SELECT, OUTPUT);
@@ -55,14 +54,24 @@ void sendInstruction(char instruction) {
 
 void write_character(char character) {
   digitalWrite(REGISTER_SELECT, HIGH);
-  
+  Serial.println(character);
   for (int i = 7; i >= 0; i--) {
-    char digit = character >> i;
+    char mask = 1 << i;
+    char result = character & mask;
+    char digit = result >> i;
     digitalWrite(data_pins[i], digit);
+    Serial.print("Writing to ");
+    Serial.print(i);
+    Serial.print(" -> ");
+    if (digit) {
+      Serial.println("1");
+    } else {
+      Serial.println("0");
+    }
   }
   digitalWrite(ENABLE, HIGH);
   digitalWrite(ENABLE, LOW);
-  Serial.println(character);
+  
 }
 
 void function_set(boolean line_number, boolean font_type) {
