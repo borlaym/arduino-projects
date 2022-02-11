@@ -24,14 +24,14 @@ void setup() {
 
 
   // Setup
-  function_set(false, false);
+  function_set(true, false);
   
   display_on_off(true, true, true);
   entry_mode_set(true, false);
   clear_display();
   return_home();  
-  write_text("profansag hosszu szoveggel");
-  write_text("Victory Royale!");
+  write_author("Viktor");
+  write_text("This is an overly long text, really long! :) Goes on and on");
 }
 
 void write_data(boolean is_character, char data, int delay_amount) {
@@ -52,12 +52,15 @@ void write_data(boolean is_character, char data, int delay_amount) {
 }
 
 void write_instruction(char instruction) {
-  write_data(false, instruction, 100);
+  write_data(false, instruction, 10);
 }
 
 void write_character(char character) {
-  Serial.println(character);
   write_data(true, character, 100);
+}
+
+void write_instant_character(char character) {
+  write_data(true, character, 10);
 }
 
 void function_set(boolean line_number, boolean font_type) {
@@ -109,21 +112,54 @@ void display_on_off(boolean display, boolean cursor, boolean blink) {
   write_instruction(instruction);
 }
 
-void write_text(const char *text) {
-  clear_display();
-  return_home();  
-  entry_mode_set(true, false); // Scrolling to false
-  int i = 0;
+/**
+ * First line: 0x00 -> 0x27
+ * Second line: 0x40 -> 0x67
+ */
+void move_cursor(char pos) {
+  char instruction = 0b10000000;
+  if (pos > 0b01111111) {
+    Serial.println("ERROR: cursor position out of bounds");
+    return;
+  }
+  instruction += pos;
+  write_instruction(instruction);
+}
+
+void move_cursor_second_line() {
+  move_cursor(0x40);
+}
+
+void write_author(const char *text) {
   while (*text) {
-    if (++i == 16) {
-      // When adding a character that would not fit on the screen
-      // Set scrolling to true
-      entry_mode_set(true, true);
-    }
     write_character(*text);
     ++text;
   }
-  delay(1000);
+  write_character(':');
+  move_cursor_second_line();
+}
+
+void write_text(const char *text) {  
+  char previous_line[16];
+  int i = 0;
+  while (*text) {
+    write_character(*text); 
+    previous_line[i] = *text; 
+    if (++i == 16) {
+      clear_display();
+      return_home();
+      char *previous_pointer = previous_line;
+      while (*previous_pointer) {
+        write_instant_character(*previous_pointer);
+        ++previous_pointer;
+      }
+      move_cursor_second_line();
+      i = 0;
+    }
+    
+    ++text;
+  }
+  delay(2000);
 }
 
 void loop() {
