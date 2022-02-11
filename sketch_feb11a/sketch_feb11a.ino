@@ -31,6 +31,7 @@ void setup() {
   clear_display();
   return_home();  
   write_text("profansag hosszu szoveggel");
+  write_text("Victory Royale!");
 }
 
 void write_data(boolean is_character, char data, int delay_amount) {
@@ -109,10 +110,20 @@ void display_on_off(boolean display, boolean cursor, boolean blink) {
 }
 
 void write_text(const char *text) {
+  clear_display();
+  return_home();  
+  entry_mode_set(true, false); // Scrolling to false
+  int i = 0;
   while (*text) {
-      write_character(*text);
-      ++text;
+    if (++i == 16) {
+      // When adding a character that would not fit on the screen
+      // Set scrolling to true
+      entry_mode_set(true, true);
+    }
+    write_character(*text);
+    ++text;
   }
+  delay(1000);
 }
 
 void loop() {
