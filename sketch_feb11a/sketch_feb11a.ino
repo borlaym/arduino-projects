@@ -8,13 +8,16 @@
 #define REGISTER_SELECT 2
 #define ENABLE 4
 // NOTE: Read / write is wired to be always write
+#define BUTTON 13
 
 int data_pins[] = {5, 6, 7, 8, 9, 10, 11, 12};
+unsigned long last_button_press = 0;
 
 void setup() {
   // put your setup code here, to run once:
   pinMode(REGISTER_SELECT, OUTPUT);
   pinMode(ENABLE, OUTPUT);
+  pinMode(BUTTON, INPUT);
   digitalWrite(ENABLE, LOW);
   for (int i = 0; i < 8; i++) {
     pinMode(data_pins[i], OUTPUT);
@@ -164,5 +167,9 @@ void write_text(const char *text) {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  unsigned long time = millis();
+  if (digitalRead(BUTTON) && time > last_button_press + 2000) {
+    Serial.println("Button was pressed");
+    last_button_press = time; 
+  }
 }
