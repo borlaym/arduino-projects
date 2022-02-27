@@ -11,14 +11,13 @@
 #define BUTTON 13
 
 int data_pins[] = {5, 6, 7, 8, 9, 10, 11, 12};
-unsigned long last_button_press = 0;
 
 void setup() {
   
   // put your setup code here, to run once:
   pinMode(REGISTER_SELECT, OUTPUT);
   pinMode(ENABLE, OUTPUT);
-//  pinMode(BUTTON, INPUT);
+  pinMode(BUTTON, INPUT);
   digitalWrite(ENABLE, LOW);
   for (int i = 0; i < 8; i++) {
     pinMode(data_pins[i], OUTPUT);
@@ -34,9 +33,9 @@ void setup() {
   entry_mode_set(true, false);
   clear_display();
   return_home();  
-//  write_scrolling_text("Marci:\nThis is my\nmessage hello");
-  write_first_line("Connecting...");
-  write_second_line("Success");
+
+//  write_first_line("Connecting...");
+//  write_second_line("Success");
 }
 
 void write_data(boolean is_character, char data, int delay_amount) {
@@ -220,10 +219,12 @@ void write_scrolling_text(const char *text) {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-//  unsigned long time = millis();
-//  if (digitalRead(BUTTON) && time > last_button_press + 2000) {
-//    Serial.println("Button was pressed");
-//    last_button_press = time; 
-//  }
+  clear_display();
+  return_home();  
+  write_scrolling_text("Marci:\nThis is my\nmessage hello");
+  
+  unsigned long time = millis();
+  if (digitalRead(BUTTON)) {
+    Serial.println("Button was pressed");
+  }
 }
